@@ -561,7 +561,6 @@
         .player-position {
             position: absolute;
             transform: translate(-50%, -50%);
-            cursor: pointer;
             text-align: center;
             z-index: 10;
             display: flex;
@@ -577,6 +576,13 @@
         .player-position .player-label {
             pointer-events: auto;
             cursor: text;
+            position: relative;
+            z-index: 20;
+            touch-action: auto;
+        }
+
+        .player-position.dragging .player-label {
+            pointer-events: none;
         }
 
         .jersey {
@@ -796,17 +802,17 @@
                 </div>
                 <div class="info-field">
                     <label>Venue:</label>
-                    <input type="text" placeholder="Enter venue">
+                    <input type="text" id="venueInput" placeholder="Enter venue">
                 </div>
                 <div class="info-field">
                     <label>Date:</label>
-                    <input type="date">
+                    <input type="date" id="dateInput">
                 </div>
                 <div class="info-field">
                     <label>Time:</label>
-                    <input type="time">
+                    <input type="time" id="timeInput">
                 </div>
-                <button class="done-btn" onclick="closeGameInfo()">Done</button>
+                <button class="done-btn" id="gameInfoDoneBtn">Done</button>
             </div>
         </div>
 
@@ -866,7 +872,7 @@
                     </div>
                 </div>
 
-                <button class="done-btn" onclick="closeJerseyPicker()">Done</button>
+                <button class="done-btn" id="jerseyDoneBtn">Done</button>
             </div>
         </div>
 
@@ -902,21 +908,21 @@
 
     <script>
         const positions = [
-            { num: 1, name: 'Goalkeeper', top: 8, left: 50 },
-            { num: 2, name: 'Right corner back', top: 20, left: 20 },
-            { num: 3, name: 'Full back', top: 20, left: 50 },
-            { num: 4, name: 'Left corner back', top: 20, left: 80 },
-            { num: 5, name: 'Right half back', top: 33, left: 20 },
-            { num: 6, name: 'Centre back', top: 33, left: 50 },
-            { num: 7, name: 'Left half back', top: 33, left: 80 },
-            { num: 8, name: 'Midfield', top: 48, left: 35 },
-            { num: 9, name: 'Midfield', top: 48, left: 65 },
-            { num: 10, name: 'Right half forward', top: 63, left: 20 },
-            { num: 11, name: 'Centre forward', top: 63, left: 50 },
-            { num: 12, name: 'Left half forward', top: 63, left: 80 },
-            { num: 13, name: 'Right corner forward', top: 76, left: 20 },
+            { num: 1, name: 'Goalkeeper', top: 6, left: 50 },
+            { num: 2, name: 'Right corner back', top: 18, left: 18 },
+            { num: 3, name: 'Full back', top: 18, left: 50 },
+            { num: 4, name: 'Left corner back', top: 18, left: 82 },
+            { num: 5, name: 'Right half back', top: 32, left: 18 },
+            { num: 6, name: 'Centre back', top: 32, left: 50 },
+            { num: 7, name: 'Left half back', top: 32, left: 82 },
+            { num: 8, name: 'Midfield', top: 48, left: 32 },
+            { num: 9, name: 'Midfield', top: 48, left: 68 },
+            { num: 10, name: 'Right half forward', top: 62, left: 18 },
+            { num: 11, name: 'Centre forward', top: 62, left: 50 },
+            { num: 12, name: 'Left half forward', top: 62, left: 82 },
+            { num: 13, name: 'Right corner forward', top: 76, left: 18 },
             { num: 14, name: 'Full forward', top: 76, left: 50 },
-            { num: 15, name: 'Left corner forward', top: 76, left: 80 }
+            { num: 15, name: 'Left corner forward', top: 76, left: 82 }
         ];
 
         const subs = [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27];
@@ -1004,11 +1010,16 @@
             let offsetX, offsetY;
             let isDragging = false;
             
-            playerDiv.addEventListener('mousedown', (e) => {
-                if (e.target.classList.contains('player-label')) {
-                    return;
-                }
+            const jersey = playerDiv.querySelector('.jersey');
+            
+            jersey.addEventListener('mousedown', (e) => {
                 isDragging = true;
+                playerDiv.classList.add('dragging');
+            });
+            
+            jersey.addEventListener('touchstart', (e) => {
+                isDragging = true;
+                playerDiv.classList.add('dragging');
             });
             
             playerDiv.addEventListener('dragstart', (e) => {
@@ -1029,12 +1040,13 @@
                 const x = ((e.clientX - fieldRect.left - offsetX) / fieldRect.width) * 100;
                 const y = ((e.clientY - fieldRect.top - offsetY) / fieldRect.height) * 100;
                 
-                playerDiv.style.left = `${Math.max(5, Math.min(95, x))}%`;
+                playerDiv.style.left = `${Math.max(8, Math.min(92, x))}%`;
                 playerDiv.style.top = `${Math.max(5, Math.min(95, y))}%`;
             });
             
             playerDiv.addEventListener('dragend', () => {
                 isDragging = false;
+                playerDiv.classList.remove('dragging');
             });
             
             field.appendChild(playerDiv);
@@ -1119,12 +1131,29 @@
             matchTitle.textContent = e.target.value;
         });
 
+        // Done button handlers
+        document.getElementById('gameInfoDoneBtn').addEventListener('click', () => {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        });
+
+        document.getElementById('jerseyDoneBtn').addEventListener('click', () => {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        });
+
         field.addEventListener('dragover', (e) => {
             e.preventDefault();
         });
 
         function closeJerseyPicker() {
-            document.querySelector('[data-tab="game-info"]').click();
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        }
+
+        function closeGameInfo() {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         }
 
         async function generateTeamImage() {
