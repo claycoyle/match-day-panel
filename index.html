@@ -473,11 +473,11 @@
         }
 
         .line-45m.top {
-            top: 20%;
+            top: 30%;
         }
 
         .line-45m.bottom {
-            bottom: 20%;
+            bottom: 30%;
         }
 
         /* 20m lines */
@@ -490,11 +490,11 @@
         }
 
         .line-20m.top {
-            top: 8%;
+            top: 13%;
         }
 
         .line-20m.bottom {
-            bottom: 8%;
+            bottom: 13%;
         }
 
         /* 13m lines (the "D" areas) */
@@ -502,21 +502,21 @@
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            width: 40%;
-            height: 5%;
+            width: 50%;
+            aspect-ratio: 2/1;
             border: 2px solid white;
-            border-radius: 0 0 50% 50%;
+            border-radius: 0 0 100% 100% / 0 0 100% 100%;
         }
 
         .d-area.top {
-            top: 3%;
+            top: 8%;
             border-top: none;
         }
 
         .d-area.bottom {
-            bottom: 3%;
+            bottom: 8%;
             border-bottom: none;
-            border-radius: 50% 50% 0 0;
+            border-radius: 100% 100% 0 0 / 100% 100% 0 0;
         }
 
         /* Goal rectangles */
@@ -524,8 +524,8 @@
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            width: 25%;
-            height: 3%;
+            width: 20%;
+            height: 4%;
             border: 2px solid white;
         }
 
@@ -544,18 +544,18 @@
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            width: 4px;
-            height: 4px;
+            width: 5px;
+            height: 5px;
             background: white;
             border-radius: 50%;
         }
 
         .penalty-spot.top {
-            top: 7%;
+            top: 11%;
         }
 
         .penalty-spot.bottom {
-            bottom: 7%;
+            bottom: 11%;
         }
 
         .player-position {
@@ -806,6 +806,7 @@
                     <label>Time:</label>
                     <input type="time">
                 </div>
+                <button class="done-btn" onclick="closeGameInfo()">Done</button>
             </div>
         </div>
 
